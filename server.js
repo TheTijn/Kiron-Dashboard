@@ -2,7 +2,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-let port = 3000;
+let port = process.env.PORT || 3000;
+const isProduction = !!process.env.PORT;
 
 const MIME_TYPES = {
   '.html': 'text/html',
@@ -19,8 +20,17 @@ const MIME_TYPES = {
 const server = http.createServer((req, res) => {
   console.log(`${req.method} ${req.url}`);
 
-  // Normalize URL path
-  let filePath = req.url === '/' ? './index.html' : '.' + req.url;
+  // Safely parse URL to strip query parameters and hash values
+  let pathname = '/';
+  try {
+    const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+    pathname = parsedUrl.pathname;
+  } catch (err) {
+    pathname = req.url.split('?')[0];
+  }
+
+  // Normalize URL path to map to static files
+  let filePath = pathname === '/' ? './index.html' : '.' + pathname;
   
   // Prevent directory traversal
   filePath = path.normalize(filePath);
@@ -50,22 +60,26 @@ const server = http.createServer((req, res) => {
 });
 
 function startServer() {
-  server.listen(port);
+  server.listen(port, () => {
+    console.log(`==================================================`);
+    console.log(`Kiron Employee Central Dashboard Server Running`);
+    console.log(`Environment: ${isProduction ? 'Production (Hostinger)' : 'Development'}`);
+    console.log(`Listening on Port: ${port}`);
+    console.log(`Local URL: http://localhost:${port}`);
+    console.log(`==================================================`);
+  });
 }
-
-server.on('listening', () => {
-  console.log(`==================================================`);
-  console.log(`Kiron Employee Central Dashboard Dev Server Running`);
-  console.log(`Local URL: http://localhost:${port}`);
-  console.log(`Press Ctrl+C to terminate server`);
-  console.log(`==================================================`);
-});
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
-    console.log(`Port ${port} is in use, trying next port...`);
-    port++;
-    startServer();
+    if (isProduction) {
+      console.error(`CRITICAL: Port ${port} is already in use in production environment!`);
+      process.exit(1);
+    } else {
+      console.log(`Port ${port} is in use locally, trying next port...`);
+      port++;
+      startServer();
+    }
   } else {
     console.error('Server error:', err);
   }
