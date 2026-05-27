@@ -1,0 +1,18 @@
+{
+  "name": "kiron-dashboard",
+  "version": "1.0.0",
+  "description": "Central employee homepage dashboard for Kiron Interactive",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "dashboard",
+    "kiron",
+    "intranet",
+    "homepage"
+  ],
+  "author": "Antigravity Pair Programmer",
+  "license": "ISC"
+}

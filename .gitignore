@@ -1,0 +1,10 @@
+node_modules/
+.DS_Store
+Thumbs.db
+.gemini/
+.system_generated/
+scratch/
+task.md
+walkthrough.md
+implementation_plan.md
+*.log

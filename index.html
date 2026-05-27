@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KIRON // INTRANET H.U.D. LOBBY</title>
+  
+  <!-- Preconnect Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- CSS Styling -->
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  
+  <!-- Canvas for High-Velocity Gaming Confetti Celebrations -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Cybernetic Grid Decorative Background -->
+  <div class="hud-cyber-grid"></div>
+
+  <div class="dashboard-container">
+    
+    <!-- Esports-Style Header Bar -->
+    <header class="dashboard-header hud-panel">
+      <div class="header-left">
+        <div class="kiron-logo">
+          <!-- Load official Kiron vector logo asset -->
+          <img src="Assets/Kiron-Logo.svg" alt="Kiron Interactive" class="kiron-logo-img">
+        </div>
+        <div class="header-greeting">
+          <span class="greeting-text" id="greeting-text">LOBBY INITIALIZING...</span>
+        </div>
+      </div>
+
+      <!-- Tactical Search Bar -->
+      <div class="header-search">
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="global-search" placeholder="Search link or google..." autocomplete="off">
+          <span class="search-hint">Search</span>
+        </div>
+        <div class="search-results-popup id-hide" id="search-results"></div>
+      </div>
+
+      <div class="header-right">
+        <!-- Avatar Cluster from Inspiration Image -->
+        <div class="avatar-cluster">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&h=80&q=80" alt="Operator" class="avatar-img">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&h=80&q=80" alt="Team Member" class="avatar-img">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&h=80&q=80" alt="Team Member" class="avatar-img">
+          <div class="avatar-more">+6</div>
+        </div>
+
+        <!-- Systems Weather HUD -->
+        <div class="weather-widget">
+          <div class="weather-icon-wrapper" id="weather-icon">
+            <svg class="sunny-icon" viewBox="0 0 24 24" fill="none" stroke="#84cc16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </div>
+          <div class="weather-info">
+            <span class="weather-temp" id="weather-temp">22°C</span>
+            <span class="weather-location" id="weather-loc">JHB HQ</span>
+          </div>
+        </div>
+
+        <!-- Systems Clock -->
+        <div class="clock-widget">
+          <div class="clock-time" id="clock-time">00:00:00</div>
+          <div class="clock-date" id="clock-date">Loading...</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="dashboard-main">
+      
+      <!-- LEFT SECTION: Game Launcher News & Player Inventory Links (63% width) -->
+      <section class="main-left-column">
+        
+        <!-- Panel 1: Steam-style Game Launcher Feed -->
+        <div class="dashboard-panel events-panel hud-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrapper">
+              <span class="panel-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+              </span>
+              <h2>LATEST RELEASES & DEVELOPMENTS</h2>
+              <span class="panel-subtitle">// GAME LAUNCHER CHANNELS</span>
+            </div>
+            <div class="carousel-controls">
+              <button class="carousel-btn prev-btn" id="prev-event" aria-label="Previous announcement">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              <button class="carousel-btn next-btn" id="next-event" aria-label="Next announcement">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            </div>
+          </div>
+          
+          <div class="carousel-container">
+            <div class="carousel-track" id="events-carousel">
+              <!-- Carousel items dynamically injected here -->
+            </div>
+          </div>
+          <div class="carousel-indicators" id="carousel-dots">
+            <!-- Indicators dots injected here -->
+          </div>
+        </div>
+
+        <!-- Panel 2: Player Equipment Inventory Links Grid -->
+        <div class="dashboard-panel links-panel hud-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrapper">
+              <span class="panel-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+              </span>
+              <h2>RESOURCE DIRECTORY & LINKS</h2>
+              <span class="panel-subtitle">// Quick Portal Links</span>
+            </div>
+            <div class="panel-actions">
+              <button class="action-link-btn" id="add-link-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>ADD QUICKLINK</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="links-grid" id="links-container">
+            <!-- Preconfigured Core Links styled as Inventory Slots -->
+            <a href="https://app.smartsheet.com/b/form/01980cee2a0e72f88d16b0f5ae66a2c6" target="_blank" class="link-card core-link recruitment-link" id="link-recruitment">
+              <div class="link-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="8.5" cy="7" r="4"></circle>
+                  <line x1="20" y1="8" x2="20" y2="14"></line>
+                  <line x1="23" y1="11" x2="17" y2="11"></line>
+                </svg>
+              </div>
+              <div class="link-info">
+                <h3>Recruitment Form</h3>
+                <p>Launch hiring Smartsheet request</p>
+              </div>
+              <div class="link-badge rarity-epic">Form</div>
+            </a>
+
+            <a href="#" class="link-card core-link travel-link" id="link-travel-trigger">
+              <div class="link-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 2L2 8.66 11.58 12.42 15.34 22 22 2Z"></path>
+                </svg>
+              </div>
+              <div class="link-info">
+                <h3>Travel Request</h3>
+                <p>Authorize business travel & expenditures</p>
+              </div>
+              <div class="link-badge rarity-legendary">Active Request</div>
+            </a>
+
+            <a href="https://form.asana.com/?k=jIKkrFaNwK0FEuYNdFZCQg&d=294067408389481" target="_blank" class="link-card core-link game-idea-link" id="link-game-idea">
+              <div class="link-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </div>
+              <div class="link-info">
+                <h3>Submit Game Idea</h3>
+                <p>Pitch your next virtual game design</p>
+              </div>
+              <div class="link-badge rarity-mythic">Asana Pitch</div>
+            </a>
+            
+
+            <a href="https://outlook.office365.com" target="_blank" class="link-card tool-link">
+              <div class="link-icon outlook-color">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M1 5.5v13L12.5 23V1l-11.5 4.5zM23 4.5V19.5c0 1.1-.9 2-2 2h-8.5v-19H21c1.1 0 2 .9 2 2z"></path>
+                </svg>
+              </div>
+              <div class="link-info">
+                <h3>Outlook Webmail</h3>
+                <p>Read mail boxes & communications</p>
+              </div>
+              <div class="link-badge rarity-common">Email</div>
+            </a>
+
+            <!-- Pinned Custom Slots dynamically injected here -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT SECTION: Birthday Leaderboards & IT Portals (37% width) -->
+      <section class="main-right-column">
+        
+        <!-- Panel 3: Birthday Leaderboard -->
+        <div class="dashboard-panel birthdays-panel hud-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrapper">
+              <span class="panel-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </span>
+              <h2>Employee Celebrations</h2>
+              <span class="panel-subtitle">// Upcoming Birthdays</span>
+            </div>
+            <div class="birthday-badge" id="bday-count-badge">0 INCOMING</div>
+          </div>
+
+          <div class="birthdays-content">
+            <div class="bday-section-title">Today's Birthdays 🎂</div>
+            <div class="birthdays-list" id="todays-birthdays">
+              <!-- Today's birthdays -->
+            </div>
+
+            <div class="bday-divider"></div>
+
+            <div class="bday-section-title">Upcoming Birthdays 🍰</div>
+            <div class="birthdays-list upcoming" id="upcoming-birthdays">
+              <!-- Upcoming birthdays -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 4: IT Directory & Contacts -->
+        <div class="dashboard-panel it-panel hud-panel">
+          <div class="panel-header" style="margin-bottom: 16px;">
+            <div class="panel-title-wrapper">
+              <span class="panel-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+              </span>
+              <h2>IT Support & Directory</h2>
+              <span class="panel-subtitle">// Direct support contacts & tools</span>
+            </div>
+            
+            <div class="panel-actions">
+              <a href="https://app.smartsheet.com/b/publish?EQBCT=64b7aa72b9a44ac49061444d27eda5ac" target="_blank" class="panel-header-action" title="Open full IT Smartsheet in new tab">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="it-directory-wrapper">
+            <div class="dir-search" style="margin-bottom: 14px;">
+              <div class="search-box" style="padding: 6px 12px; border-radius: var(--border-radius-md);">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px; margin-right: 6px;">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="dir-search-input" placeholder="Search support contacts, systems or links..." style="font-size: 12px;">
+              </div>
+            </div>
+            <div class="dir-list" id="it-dir-list">
+              <!-- Directory items injected dynamically -->
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal 1: Announcements Overlay -->
+  <div class="modal-backdrop id-hide" id="event-modal">
+    <div class="modal-card hud-modal">
+      <div class="modal-header">
+        <span class="modal-category" id="modal-category">ANNOUNCEMENT</span>
+        <button class="modal-close-btn" id="close-event-modal" aria-label="Close modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h2 id="modal-title">Announcement Title</h2>
+        <div class="modal-meta">
+          <span class="modal-date" id="modal-date">DATE</span>
+          <span class="modal-author" id="modal-author">AUTHOR</span>
+        </div>
+        <div class="modal-rich-content" id="modal-content">
+          <!-- Text -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Add Custom Link -->
+  <div class="modal-backdrop id-hide" id="add-link-modal">
+    <div class="modal-card mini-modal hud-modal">
+      <div class="modal-header">
+        <h2>ADD PERSONAL LINK</h2>
+        <button class="modal-close-btn" id="close-link-modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <form id="add-link-form" class="modal-form">
+        <div class="form-group">
+          <label for="link-title">LINK TITLE *</label>
+          <input type="text" id="link-title" required placeholder="e.g. Jira Board, Wiki Portal" maxlength="20">
+        </div>
+        <div class="form-group">
+          <label for="link-url">URL *</label>
+          <input type="url" id="link-url" required placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label for="link-desc">DESCRIPTION</label>
+          <input type="text" id="link-desc" placeholder="e.g. Project board dashboard" maxlength="45">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" id="cancel-link-btn">Cancel</button>
+          <button type="submit" class="btn-primary">Add Link</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 3: Travel Request Form -->
+  <div class="modal-backdrop id-hide" id="travel-modal">
+    <div class="modal-card travel-modal hud-modal">
+      <div class="modal-header">
+        <div class="travel-modal-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#84cc16" stroke-width="2" class="travel-title-icon">
+            <path d="M22 2L2 8.66 11.58 12.42 15.34 22 22 2Z"></path>
+          </svg>
+          <h2>TRAVEL REQUEST FORM</h2>
+        </div>
+        <button class="modal-close-btn" id="close-travel-modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="travel-intro">
+          <p>Fill out the fields below to draft your corporate business travel request. Once compiled, you can copy the summarized request card to send to your manager for approval.</p>
+        </div>
+        <form id="travel-request-form" class="modal-form grid-form">
+          <div class="form-group half-width">
+            <label for="traveler-name">TRAVELLER NAME *</label>
+            <input type="text" id="traveler-name" required placeholder="Employee Full Name">
+          </div>
+          <div class="form-group half-width">
+            <label for="travel-dept">DEPARTMENT *</label>
+            <select id="travel-dept" required>
+              <option value="" disabled selected>Select Department</option>
+              <option value="Game Development">Game Development</option>
+              <option value="Virtual Sports Operations">Virtual Sports Operations</option>
+              <option value="QA & Testing">QA & Testing</option>
+              <option value="Sales & Account Management">Sales & Account Management</option>
+              <option value="Executive & Admin">Executive & Admin</option>
+              <option value="HR / Legal">HR / Legal</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="travel-destination">DESTINATION *</label>
+            <input type="text" id="travel-destination" required placeholder="e.g. London, UK (ICE Exhibition)">
+          </div>
+          <div class="form-group half-width">
+            <label for="travel-departure">DEPARTURE DATE *</label>
+            <input type="date" id="travel-departure" required>
+          </div>
+          <div class="form-group half-width">
+            <label for="travel-return">RETURN DATE *</label>
+            <input type="date" id="travel-return" required>
+          </div>
+          <div class="form-group">
+            <label for="travel-purpose">PURPOSE & JUSTIFICATION *</label>
+            <textarea id="travel-purpose" rows="3" required placeholder="Outline key milestones and target commercial achievements..."></textarea>
+          </div>
+          <div class="form-group half-width">
+            <label for="travel-hotel">LODGING / HOTEL REQUIRED?</label>
+            <select id="travel-hotel">
+              <option value="Yes">Yes, secure team lodging</option>
+              <option value="No">No, self-secured / not required</option>
+            </select>
+          </div>
+          <div class="form-group half-width">
+            <label for="travel-budget">ESTIMATED BUDGET ($USD)</label>
+            <input type="number" id="travel-budget" placeholder="e.g. 2500" min="0">
+          </div>
+          
+          <div class="travel-form-footer">
+            <div class="admin-notice">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span><strong>Note:</strong> These parameters can be updated in standard administration panels to bind directly to travel portals like Concur / TravelPerk.</span>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" id="cancel-travel-btn">Cancel</button>
+              <button type="submit" class="btn-primary">Compile Request 📄</button>
+            </div>
+          </div>
+        </form>
+        
+        <!-- Summary Result Pane -->
+        <div class="travel-summary-result id-hide" id="travel-summary-pane">
+          <h3>Request Summary Compiled!</h3>
+          <p>Copy the summarized request packet below and send it to your manager.</p>
+          <div class="summary-code-block" id="summary-code-block"></div>
+          <div class="summary-actions">
+            <button class="btn-secondary" id="edit-request-btn">Re-draft</button>
+            <button class="btn-primary btn-copy" id="copy-request-btn">
+              <span>Copy Request</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Interaction -->
+  <script src="app.js"></script>
+</body>
+</html>
