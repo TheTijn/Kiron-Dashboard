@@ -1,0 +1,114 @@
+/* Kiron CMS — shared admin styles. */
+
+.admin-shell { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
+
+/* ===== Sidebar ===== */
+.sidebar {
+  background: var(--panel); border-right: 1px solid var(--line);
+  padding: 20px 16px; display: flex; flex-direction: column; gap: 4px;
+  position: sticky; top: 0; height: 100vh;
+}
+.sidebar .brand { display: flex; align-items: baseline; gap: 8px; padding: 4px 8px 18px; }
+.sidebar .brand-word { font-size: 18px; font-weight: 800; letter-spacing: -.02em; }
+.sidebar .brand-dot { color: var(--green-bright); }
+.sidebar .brand-sub { font-family: var(--font-mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-3); }
+.nav-label { padding: 14px 8px 6px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 9px;
+  font-size: 14px; color: var(--ink-2); font-weight: 500;
+}
+.nav-item:hover { background: var(--hover); color: var(--ink); }
+.nav-item.active { background: var(--green-tint); color: var(--green); font-weight: 600; }
+.nav-item .ico { width: 17px; text-align: center; }
+.sidebar-foot { margin-top: auto; border-top: 1px solid var(--line-soft); padding-top: 14px; }
+.sidebar-foot .who { padding: 0 8px 10px; }
+.sidebar-foot .who .n { font-size: 13px; font-weight: 600; }
+.sidebar-foot .who .r { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+
+/* ===== Main ===== */
+.admin-main { padding: 28px 34px 60px; max-width: 1000px; }
+.admin-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.admin-head h1 { font-size: 23px; font-weight: 800; letter-spacing: -.02em; }
+.admin-head .sub { font-size: 14px; color: var(--ink-3); margin-top: 3px; }
+.admin-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ===== Cards / stats ===== */
+.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 26px; }
+.stat {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px;
+}
+.stat .v { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+.stat .k { font-size: 12.5px; color: var(--ink-3); margin-top: 2px; }
+.stat.warn { border-color: rgba(180,83,9,.3); background: #fdf9f0; }
+.stat.warn .v { color: var(--amber); }
+
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+.card + .card { margin-top: 18px; }
+.card-head { padding: 16px 20px; border-bottom: 1px solid var(--line-soft); display: flex; align-items: center; justify-content: space-between; }
+.card-head h2 { font-size: 15px; font-weight: 700; }
+.card-body { padding: 8px 20px 12px; }
+
+/* ===== Table / rows ===== */
+.row-item {
+  display: flex; align-items: center; gap: 14px; padding: 13px 0; border-top: 1px solid var(--line-soft);
+}
+.row-item:first-child { border-top: none; }
+.row-main { flex: 1; min-width: 0; }
+.row-title { font-size: 14.5px; font-weight: 600; }
+.row-sub { font-size: 12.5px; color: var(--ink-3); margin-top: 2px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.row-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+/* ===== Forms layout ===== */
+.form-grid { display: grid; grid-template-columns: 1fr 300px; gap: 26px; align-items: start; }
+.form-side .card-body { padding: 16px 20px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.editor-toolbar { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
+.editor-toolbar button {
+  border: 1px solid var(--line); background: var(--panel); border-radius: 7px;
+  width: 34px; height: 32px; font-size: 14px; color: var(--ink-2);
+}
+.editor-toolbar button:hover { background: var(--hover); border-color: var(--green-border); }
+.rte {
+  min-height: 240px; border: 1px solid var(--line); border-radius: var(--radius-sm);
+  padding: 14px 16px; font-size: 15px; line-height: 1.65; background: var(--panel);
+}
+.rte:focus { outline: none; border-color: var(--green-bright); box-shadow: 0 0 0 3px rgba(132,204,22,.15); }
+.rte:empty::before { content: attr(data-placeholder); color: var(--ink-3); }
+.rte p { margin-bottom: 12px; }
+.rte ul, .rte ol { margin: 0 0 12px 22px; }
+
+/* photo thumbs in editor */
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 8px; margin-top: 10px; }
+.thumb { position: relative; }
+.thumb img { width: 100%; height: 72px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); }
+.thumb button {
+  position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--danger); color: #fff; border: 2px solid #fff; font-size: 13px; line-height: 1;
+}
+.dropzone {
+  border: 1.5px dashed var(--line); border-radius: var(--radius-sm); padding: 20px; text-align: center;
+  color: var(--ink-3); font-size: 13.5px; cursor: pointer; transition: border-color .15s, background .15s;
+}
+.dropzone:hover, .dropzone.drag { border-color: var(--green-bright); background: var(--green-tint); color: var(--green); }
+
+.review-flag { color: var(--amber); font-weight: 600; }
+
+/* ===== Modal (shared small dialog) ===== */
+.dialog-overlay { position: fixed; inset: 0; background: rgba(24,24,27,.4); display: grid; place-items: center; padding: 24px; z-index: 3000; backdrop-filter: blur(2px); }
+.dialog { background: var(--panel); border-radius: var(--radius); width: 100%; max-width: 480px; box-shadow: var(--shadow-md); }
+.dialog-head { padding: 18px 22px; border-bottom: 1px solid var(--line-soft); font-size: 16px; font-weight: 700; }
+.dialog-body { padding: 18px 22px; }
+.dialog-foot { padding: 14px 22px; border-top: 1px solid var(--line-soft); display: flex; justify-content: flex-end; gap: 8px; }
+
+.toplink { font-size: 13px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; }
+.toplink:hover { color: var(--green); }
+
+@media (max-width: 820px) {
+  .admin-shell { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .sidebar-foot { margin: 0 0 0 auto; border: none; padding: 0; }
+  .nav-label { display: none; }
+  .form-grid { grid-template-columns: 1fr; }
+  .stat-row { grid-template-columns: 1fr; }
+  .admin-main { padding: 20px 16px 48px; }
+}

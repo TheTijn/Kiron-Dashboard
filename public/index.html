@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/Assets/Kiron-Logo.svg" />
+  <title>Kiron · The Board</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+  <!-- ===== Header ===== -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <span class="brand-word">KIRON<span class="brand-dot">.</span></span>
+        <span class="brand-sub">The Board</span>
+      </a>
+
+      <div class="search" id="search">
+        <svg viewBox="0 0 24 24" class="search-ico" aria-hidden="true"><path d="M21 21l-4.3-4.3M11 19a8 8 0 100-16 8 8 0 000 16z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="search-input" type="text" placeholder="Search announcements, links, people" autocomplete="off" />
+        <kbd>/</kbd>
+        <div class="search-results" id="search-results" hidden></div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="clock">
+          <span class="clock-time" id="clock-time">--:--</span>
+          <span class="clock-zone">Johannesburg · SAST</span>
+        </div>
+        <div class="usermenu" id="usermenu">
+          <button class="user-btn" id="user-btn">
+            <span class="avatar" id="user-avatar">–</span>
+            <span class="user-meta">
+              <span class="user-name" id="user-name">…</span>
+              <span class="user-role eyebrow" id="user-role"></span>
+            </span>
+          </button>
+          <div class="user-dropdown" id="user-dropdown" hidden>
+            <a href="/admin" id="cms-link" class="user-dropdown-item" hidden>Open the CMS</a>
+            <button class="user-dropdown-item" id="logout-btn">Sign out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- ===== Next Off strip ===== -->
+    <section class="next-off" id="next-off">
+      <div class="section-head">
+        <span class="eyebrow"><span class="live-dot"></span> Next off</span>
+        <span class="eyebrow">Counts down live · times in SAST</span>
+      </div>
+      <div class="next-off-track" id="next-off-track"></div>
+    </section>
+
+    <div class="board-grid">
+      <!-- ===== Notice Board ===== -->
+      <section class="notice">
+        <div class="section-head">
+          <h2 class="section-title">Notice Board</h2>
+          <span class="eyebrow" id="post-count"></span>
+        </div>
+        <div class="tabs" id="tabs"></div>
+        <div class="post-list" id="post-list">
+          <div class="empty"><span class="spinner"></span></div>
+        </div>
+      </section>
+
+      <!-- ===== Quick Links ===== -->
+      <aside class="links">
+        <div class="section-head">
+          <h2 class="section-title">Quick Links</h2>
+        </div>
+        <div class="link-grid" id="link-grid"></div>
+      </aside>
+    </div>
+
+    <footer class="board-foot">
+      <span>Kiron Interactive · The Board</span>
+      <span class="muted">The single place company news lives — posted once, seen by everyone.</span>
+    </footer>
+  </main>
+
+  <!-- ===== Post modal ===== -->
+  <div class="modal-overlay" id="post-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <button class="modal-close" id="post-modal-close" aria-label="Close">&times;</button>
+      <div class="modal-body" id="post-modal-body"></div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

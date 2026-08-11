@@ -1,4 +1,12 @@
 node_modules/
+
+# Runtime data — do NOT commit (contains user accounts, posts, uploads)
+db/*.sqlite
+db/*.sqlite-shm
+db/*.sqlite-wal
+uploads/*
+!uploads/.gitkeep
+
 .DS_Store
 Thumbs.db
 .gemini/

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/Assets/Kiron-Logo.svg" />
+  <title>Users · Kiron CMS</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body>
+  <div class="admin-shell">
+    <nav class="sidebar" id="sidebar"></nav>
+    <main class="admin-main">
+      <div class="admin-head">
+        <div><h1>Users</h1><div class="sub">Who can sign in, and who can publish. Editors and admins can post; viewers read only.</div></div>
+        <div class="admin-actions"><button class="btn btn-primary" id="add">＋ Add user</button></div>
+      </div>
+      <div class="card"><div class="card-body" id="list"><div class="empty"><span class="spinner"></span></div></div></div>
+    </main>
+  </div>
+
+  <div id="toast"></div>
+  <script src="/admin/admin.js"></script>
+  <script>
+    (async function () {
+      const user = await Admin.init('users');
+      if (!user) return;
+      const esc = Admin.esc;
+
+      const roleChip = (r) => r === 'admin' ? '<span class="chip">Admin</span>'
+        : r === 'editor' ? '<span class="chip">Editor</span>' : '<span class="chip chip-muted">Viewer</span>';
+
+      async function load() {
+        const { users } = await Admin.api('/api/users');
+        document.getElementById('list').innerHTML = users.map(row).join('');
+        bind(users);
+      }
+      function row(u) {
+        return `<div class="row-item">
+          <div class="avatar" style="width:36px;height:36px">${esc(initials(u.name))}</div>
+          <div class="row-main">
+            <div class="row-title">${esc(u.name)} ${roleChip(u.role)} ${u.is_active ? '' : '<span class="chip chip-muted">Disabled</span>'}</div>
+            <div class="row-sub"><span>${esc(u.email)}</span> ${u.job_title ? '· ' + esc(u.job_title) : ''} ${u.department ? '· ' + esc(u.department) : ''}</div>
+          </div>
+          <div class="row-actions">
+            <button class="btn btn-sm" data-edit="${u.id}">Edit</button>
+            ${u.id === user.id ? '' : `<button class="btn btn-sm btn-danger" data-del="${u.id}" data-title="${esc(u.name)}">Delete</button>`}
+          </div>
+        </div>`;
+      }
+      function initials(n) { return String(n || '?').trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase(); }
+
+      function bind(users) {
+        document.querySelectorAll('[data-edit]').forEach((b) =>
+          b.addEventListener('click', () => openForm(users.find((x) => x.id == b.dataset.edit))));
+        document.querySelectorAll('[data-del]').forEach((b) =>
+          b.addEventListener('click', async () => {
+            if (!await Admin.confirmDialog({ title: 'Delete user', message: `Delete ${b.dataset.title}? They will lose access.` })) return;
+            try { await Admin.send('DELETE', '/api/users/' + b.dataset.del); Admin.toast('Deleted'); load(); }
+            catch (e) { Admin.toast(e.message, true); }
+          }));
+      }
+
+      function openForm(u) {
+        const editing = !!u; u = u || {};
+        const overlay = document.createElement('div');
+        overlay.className = 'dialog-overlay';
+        overlay.innerHTML = `
+          <div class="dialog" style="max-width:520px">
+            <div class="dialog-head">${editing ? 'Edit user' : 'Add user'}</div>
+            <div class="dialog-body">
+              <label class="field"><span>Full name</span><input id="d-name" type="text" value="${esc(u.name || '')}"></label>
+              <label class="field"><span>Work email</span><input id="d-email" type="email" value="${esc(u.email || '')}" ${editing ? 'disabled' : ''}></label>
+              <div class="form-row">
+                <label class="field"><span>Role</span>
+                  <select id="d-role">
+                    <option value="viewer" ${u.role === 'viewer' ? 'selected' : ''}>Viewer — read only</option>
+                    <option value="editor" ${u.role === 'editor' ? 'selected' : ''}>Editor — can publish</option>
+                    <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin — full control</option>
+                  </select>
+                </label>
+                <label class="field"><span>Department</span><input id="d-dept" type="text" value="${esc(u.department || '')}"></label>
+              </div>
+              <label class="field"><span>Job title</span><input id="d-title" type="text" value="${esc(u.job_title || '')}"></label>
+              <label class="field"><span>${editing ? 'New password (leave blank to keep)' : 'Password (8+ characters)'}</span>
+                <input id="d-pass" type="text" placeholder="${editing ? '••••••••' : ''}" autocomplete="new-password"></label>
+              ${editing ? `<label style="display:flex;align-items:center;gap:9px;font-size:14px;cursor:pointer;">
+                <input id="d-active" type="checkbox" style="width:auto" ${u.is_active === false ? '' : 'checked'}> Account active</label>` : ''}
+            </div>
+            <div class="dialog-foot">
+              <button class="btn" data-x="cancel">Cancel</button>
+              <button class="btn btn-primary" data-x="save">Save</button>
+            </div>
+          </div>`;
+        document.body.appendChild(overlay);
+        const close = () => overlay.remove();
+        overlay.addEventListener('click', async (e) => {
+          if (e.target === overlay || e.target.dataset.x === 'cancel') return close();
+          if (e.target.dataset.x === 'save') {
+            const body = {
+              name: overlay.querySelector('#d-name').value.trim(),
+              email: overlay.querySelector('#d-email').value.trim(),
+              role: overlay.querySelector('#d-role').value,
+              department: overlay.querySelector('#d-dept').value.trim(),
+              job_title: overlay.querySelector('#d-title').value.trim(),
+              password: overlay.querySelector('#d-pass').value
+            };
+            if (editing) body.is_active = overlay.querySelector('#d-active').checked;
+            try {
+              if (editing) await Admin.send('PUT', '/api/users/' + u.id, body);
+              else await Admin.send('POST', '/api/users', body);
+              Admin.toast('Saved'); close(); load();
+            } catch (err) { Admin.toast(err.message, true); }
+          }
+        });
+      }
+
+      document.getElementById('add').addEventListener('click', () => openForm(null));
+      load();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/Assets/Kiron-Logo.svg" />
+  <title>Next Off · Kiron CMS</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body>
+  <div class="admin-shell">
+    <nav class="sidebar" id="sidebar"></nav>
+    <main class="admin-main">
+      <div class="admin-head">
+        <div><h1>Next Off</h1><div class="sub">Upcoming events that count down live at the top of the Board.</div></div>
+        <div class="admin-actions"><button class="btn btn-primary" id="add">＋ Add event</button></div>
+      </div>
+      <div class="card"><div class="card-body" id="list"><div class="empty"><span class="spinner"></span></div></div></div>
+    </main>
+  </div>
+
+  <div id="toast"></div>
+  <script src="/admin/admin.js"></script>
+  <script>
+    (async function () {
+      const user = await Admin.init('events');
+      if (!user) return;
+      const esc = Admin.esc;
+
+      // datetime-local wants "YYYY-MM-DDTHH:mm"; the API stores ISO.
+      function toLocalInput(iso) {
+        if (!iso) return '';
+        const d = new Date(iso); if (isNaN(d)) return '';
+        const p = (n) => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+      }
+
+      async function load() {
+        const { events } = await Admin.api('/api/events?scope=all');
+        document.getElementById('list').innerHTML = events.length ? events.map(row).join('')
+          : '<div class="empty">No events yet.</div>';
+        bind(events);
+      }
+      function row(e) {
+        const when = new Date(e.starts_at);
+        const past = when.getTime() < Date.now();
+        return `<div class="row-item">
+          <div style="width:96px"><span class="chip chip-muted">${esc(e.label)}</span></div>
+          <div class="row-main">
+            <div class="row-title">${esc(e.title)} ${e.is_active ? '' : '<span class="chip chip-muted">Hidden</span>'} ${past ? '<span class="chip chip-amber">Past</span>' : ''}</div>
+            <div class="row-sub"><span>${esc(Admin.fmtDate(e.starts_at))} ${esc(when.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }))}</span> ${e.location ? '· ' + esc(e.location) : ''}</div>
+          </div>
+          <div class="row-actions">
+            <button class="btn btn-sm" data-edit="${e.id}">Edit</button>
+            <button class="btn btn-sm btn-danger" data-del="${e.id}" data-title="${esc(e.title)}">Delete</button>
+          </div>
+        </div>`;
+      }
+      function bind(events) {
+        document.querySelectorAll('[data-edit]').forEach((b) =>
+          b.addEventListener('click', () => openForm(events.find((x) => x.id == b.dataset.edit))));
+        document.querySelectorAll('[data-del]').forEach((b) =>
+          b.addEventListener('click', async () => {
+            if (!await Admin.confirmDialog({ title: 'Delete event', message: `Delete “${b.dataset.title}”?` })) return;
+            try { await Admin.send('DELETE', '/api/events/' + b.dataset.del); Admin.toast('Deleted'); load(); }
+            catch (e) { Admin.toast(e.message, true); }
+          }));
+      }
+
+      function openForm(ev) {
+        const e = ev || {};
+        const overlay = document.createElement('div');
+        overlay.className = 'dialog-overlay';
+        overlay.innerHTML = `
+          <div class="dialog" style="max-width:520px">
+            <div class="dialog-head">${ev ? 'Edit event' : 'Add event'}</div>
+            <div class="dialog-body">
+              <div class="form-row">
+                <label class="field"><span>Label</span><input id="d-label" type="text" value="${esc(e.label || '')}" placeholder="e.g. ALL HANDS"></label>
+                <label class="field"><span>Starts at</span><input id="d-when" type="datetime-local" value="${toLocalInput(e.starts_at)}"></label>
+              </div>
+              <label class="field"><span>Title</span><input id="d-title" type="text" value="${esc(e.title || '')}" placeholder="e.g. Company town hall"></label>
+              <label class="field"><span>Location / detail</span><input id="d-loc" type="text" value="${esc(e.location || '')}" placeholder="e.g. Auditorium + Teams"></label>
+              <label style="display:flex;align-items:center;gap:9px;font-size:14px;cursor:pointer;">
+                <input id="d-active" type="checkbox" style="width:auto" ${e.is_active === false ? '' : 'checked'}> Show on the Board
+              </label>
+            </div>
+            <div class="dialog-foot">
+              <button class="btn" data-x="cancel">Cancel</button>
+              <button class="btn btn-primary" data-x="save">Save</button>
+            </div>
+          </div>`;
+        document.body.appendChild(overlay);
+        const close = () => overlay.remove();
+        overlay.addEventListener('click', async (evt) => {
+          if (evt.target === overlay || evt.target.dataset.x === 'cancel') return close();
+          if (evt.target.dataset.x === 'save') {
+            const whenVal = overlay.querySelector('#d-when').value;
+            const body = {
+              label: overlay.querySelector('#d-label').value.trim(),
+              title: overlay.querySelector('#d-title').value.trim(),
+              location: overlay.querySelector('#d-loc').value.trim(),
+              starts_at: whenVal ? new Date(whenVal).toISOString() : '',
+              is_active: overlay.querySelector('#d-active').checked
+            };
+            if (!body.label || !body.title || !body.starts_at) { Admin.toast('Label, title and start time are required', true); return; }
+            try {
+              if (ev) await Admin.send('PUT', '/api/events/' + ev.id, body);
+              else await Admin.send('POST', '/api/events', body);
+              Admin.toast('Saved'); close(); load();
+            } catch (err) { Admin.toast(err.message, true); }
+          }
+        });
+      }
+
+      document.getElementById('add').addEventListener('click', () => openForm(null));
+      load();
+    })();
+  </script>
+</body>
+</html>

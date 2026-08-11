@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/Assets/Kiron-Logo.svg" />
+  <title>Dashboard · Kiron CMS</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body>
+  <div class="admin-shell">
+    <nav class="sidebar" id="sidebar"></nav>
+    <main class="admin-main">
+      <div class="admin-head">
+        <div>
+          <h1>Dashboard</h1>
+          <div class="sub">Everything published here is live on the Board — posted once, seen by everyone.</div>
+        </div>
+        <div class="admin-actions">
+          <a class="btn btn-primary" href="/admin/posts">＋ New post</a>
+        </div>
+      </div>
+
+      <div class="stat-row" id="stats"></div>
+
+      <div class="card" id="review-card" hidden>
+        <div class="card-head"><h2>Needs review</h2><span class="chip chip-amber">Owner + review date</span></div>
+        <div class="card-body" id="review-list"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>All posts</h2>
+          <span class="eyebrow" id="post-total"></span>
+        </div>
+        <div class="card-body" id="post-list"><div class="empty"><span class="spinner"></span></div></div>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast"></div>
+  <script src="/admin/admin.js"></script>
+  <script>
+    (async function () {
+      const user = await Admin.init('dashboard');
+      if (!user) return;
+      const esc = Admin.esc;
+
+      function isOverdue(d) { return d && d < new Date().toISOString().slice(0, 10); }
+
+      async function load() {
+        const { posts } = await Admin.api('/api/posts?scope=all');
+        const published = posts.filter((p) => p.status === 'published');
+        const drafts = posts.filter((p) => p.status === 'draft');
+        const overdue = posts.filter((p) => isOverdue(p.review_date));
+        const noOwner = posts.filter((p) => !p.owner_name);
+
+        document.getElementById('stats').innerHTML = `
+          <div class="stat"><div class="v">${published.length}</div><div class="k">Published</div></div>
+          <div class="stat"><div class="v">${drafts.length}</div><div class="k">Drafts</div></div>
+          <div class="stat ${overdue.length ? 'warn' : ''}"><div class="v">${overdue.length}</div><div class="k">Past review date</div></div>`;
+
+        // Needs-review section: overdue review dates or missing owners.
+        const flagged = posts.filter((p) => isOverdue(p.review_date) || !p.owner_name);
+        const rc = document.getElementById('review-card');
+        if (flagged.length) {
+          rc.hidden = false;
+          document.getElementById('review-list').innerHTML = flagged.map((p) => rowHtml(p, true)).join('');
+        } else { rc.hidden = true; }
+
+        document.getElementById('post-total').textContent = posts.length + ' total';
+        document.getElementById('post-list').innerHTML = posts.length
+          ? posts.map((p) => rowHtml(p, false)).join('')
+          : '<div class="empty">No posts yet. Create your first one.</div>';
+
+        bind();
+      }
+
+      function rowHtml(p, review) {
+        const status = p.status === 'published'
+          ? '<span class="chip">Published</span>' : '<span class="chip chip-muted">Draft</span>';
+        const pin = p.pinned ? '<span class="chip">Pinned</span>' : '';
+        const owner = p.owner_name
+          ? 'Owner: ' + esc(p.owner_name)
+          : '<span class="review-flag">No owner</span>';
+        const rev = p.review_date
+          ? (isOverdue(p.review_date) ? '<span class="review-flag">Review overdue ' + esc(p.review_date) + '</span>' : 'Review by ' + esc(p.review_date))
+          : '<span class="review-flag">No review date</span>';
+        return `
+          <div class="row-item">
+            <div class="row-main">
+              <div class="row-title">${esc(p.title)}</div>
+              <div class="row-sub">${status} ${pin} <span>${esc(p.category_name || '')}</span> · <span>${owner}</span> · <span>${rev}</span></div>
+            </div>
+            <div class="row-actions">
+              <a class="btn btn-sm" href="/admin/posts?id=${p.id}">Edit</a>
+              <button class="btn btn-sm btn-danger" data-del="${p.id}" data-title="${esc(p.title)}">Delete</button>
+            </div>
+          </div>`;
+      }
+
+      function bind() {
+        document.querySelectorAll('[data-del]').forEach((b) => {
+          b.addEventListener('click', async () => {
+            const ok = await Admin.confirmDialog({
+              title: 'Delete post', message: `Delete “${b.dataset.title}”? This cannot be undone.`, confirmLabel: 'Delete'
+            });
+            if (!ok) return;
+            try { await Admin.send('DELETE', '/api/posts/' + b.dataset.del); Admin.toast('Post deleted'); load(); }
+            catch (e) { Admin.toast(e.message, true); }
+          });
+        });
+      }
+
+      load();
+    })();
+  </script>
+</body>
+</html>

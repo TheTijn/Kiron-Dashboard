@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/Assets/Kiron-Logo.svg" />
+  <title>Quick Links · Kiron CMS</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body>
+  <div class="admin-shell">
+    <nav class="sidebar" id="sidebar"></nav>
+    <main class="admin-main">
+      <div class="admin-head">
+        <div><h1>Quick Links</h1><div class="sub">Curated shortcuts to the systems people use daily.</div></div>
+        <div class="admin-actions"><button class="btn btn-primary" id="add">＋ Add link</button></div>
+      </div>
+      <div class="card"><div class="card-body" id="list"><div class="empty"><span class="spinner"></span></div></div></div>
+    </main>
+  </div>
+
+  <div id="toast"></div>
+  <script src="/admin/admin.js"></script>
+  <script>
+    (async function () {
+      const user = await Admin.init('links');
+      if (!user) return;
+      const esc = Admin.esc;
+
+      async function load() {
+        const { links } = await Admin.api('/api/links?scope=all');
+        document.getElementById('list').innerHTML = links.length ? links.map(row).join('')
+          : '<div class="empty">No links yet.</div>';
+        bind(links);
+      }
+      function row(l) {
+        return `<div class="row-item">
+          <div style="font-size:20px;width:26px;text-align:center">${esc(l.icon || '🔗')}</div>
+          <div class="row-main">
+            <div class="row-title">${esc(l.title)} ${l.is_active ? '' : '<span class="chip chip-muted">Hidden</span>'}</div>
+            <div class="row-sub"><span>${esc(l.subtitle || '')}</span> · <a href="${esc(l.url)}" target="_blank" rel="noopener" style="color:var(--green)">${esc(l.url)}</a> ${l.category ? '· ' + esc(l.category) : ''}</div>
+          </div>
+          <div class="row-actions">
+            <button class="btn btn-sm" data-edit="${l.id}">Edit</button>
+            <button class="btn btn-sm btn-danger" data-del="${l.id}" data-title="${esc(l.title)}">Delete</button>
+          </div>
+        </div>`;
+      }
+      function bind(links) {
+        document.querySelectorAll('[data-edit]').forEach((b) =>
+          b.addEventListener('click', () => openForm(links.find((x) => x.id == b.dataset.edit))));
+        document.querySelectorAll('[data-del]').forEach((b) =>
+          b.addEventListener('click', async () => {
+            if (!await Admin.confirmDialog({ title: 'Delete link', message: `Delete “${b.dataset.title}”?` })) return;
+            try { await Admin.send('DELETE', '/api/links/' + b.dataset.del); Admin.toast('Deleted'); load(); }
+            catch (e) { Admin.toast(e.message, true); }
+          }));
+      }
+
+      function openForm(link) {
+        const l = link || {};
+        const overlay = document.createElement('div');
+        overlay.className = 'dialog-overlay';
+        overlay.innerHTML = `
+          <div class="dialog" style="max-width:520px">
+            <div class="dialog-head">${link ? 'Edit link' : 'Add link'}</div>
+            <div class="dialog-body">
+              <div class="form-row">
+                <label class="field"><span>Title</span><input id="d-title" type="text" value="${esc(l.title || '')}"></label>
+                <label class="field"><span>Icon (emoji)</span><input id="d-icon" type="text" value="${esc(l.icon || '')}" placeholder="🔗"></label>
+              </div>
+              <label class="field"><span>Subtitle</span><input id="d-sub" type="text" value="${esc(l.subtitle || '')}" placeholder="e.g. Raise a ticket"></label>
+              <label class="field"><span>URL</span><input id="d-url" type="url" value="${esc(l.url || '')}" placeholder="https://…"></label>
+              <div class="form-row">
+                <label class="field"><span>Category</span><input id="d-cat" type="text" value="${esc(l.category || '')}" placeholder="e.g. IT"></label>
+                <label class="field"><span>Sort order</span><input id="d-sort" type="number" value="${l.sort_order != null ? l.sort_order : 0}"></label>
+              </div>
+              <label style="display:flex;align-items:center;gap:9px;font-size:14px;cursor:pointer;">
+                <input id="d-active" type="checkbox" style="width:auto" ${l.is_active === false ? '' : 'checked'}> Visible on the Board
+              </label>
+            </div>
+            <div class="dialog-foot">
+              <button class="btn" data-x="cancel">Cancel</button>
+              <button class="btn btn-primary" data-x="save">Save</button>
+            </div>
+          </div>`;
+        document.body.appendChild(overlay);
+        const close = () => overlay.remove();
+        overlay.addEventListener('click', async (e) => {
+          if (e.target === overlay || e.target.dataset.x === 'cancel') return close();
+          if (e.target.dataset.x === 'save') {
+            const body = {
+              title: overlay.querySelector('#d-title').value.trim(),
+              icon: overlay.querySelector('#d-icon').value.trim(),
+              subtitle: overlay.querySelector('#d-sub').value.trim(),
+              url: overlay.querySelector('#d-url').value.trim(),
+              category: overlay.querySelector('#d-cat').value.trim(),
+              sort_order: Number(overlay.querySelector('#d-sort').value) || 0,
+              is_active: overlay.querySelector('#d-active').checked
+            };
+            if (!body.title || !body.url) { Admin.toast('Title and URL are required', true); return; }
+            try {
+              if (link) await Admin.send('PUT', '/api/links/' + link.id, body);
+              else await Admin.send('POST', '/api/links', body);
+              Admin.toast('Saved'); close(); load();
+            } catch (err) { Admin.toast(err.message, true); }
+          }
+        });
+      }
+
+      document.getElementById('add').addEventListener('click', () => openForm(null));
+      load();
+    })();
+  </script>
+</body>
+</html>

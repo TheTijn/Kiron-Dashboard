@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/Assets/Kiron-Logo.svg" />
+  <title>Edit post · Kiron CMS</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body>
+  <div class="admin-shell">
+    <nav class="sidebar" id="sidebar"></nav>
+    <main class="admin-main">
+      <div class="admin-head">
+        <div>
+          <h1 id="page-title">New post</h1>
+          <div class="sub" id="page-sub">Write it once — everyone sees the same version.</div>
+        </div>
+        <div class="admin-actions">
+          <a class="btn" href="/admin">Cancel</a>
+          <button class="btn" id="save-draft">Save draft</button>
+          <button class="btn btn-primary" id="save-publish">Publish</button>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div>
+          <div class="card">
+            <div class="card-body" style="padding-top:16px;">
+              <label class="field">
+                <span>Title</span>
+                <input type="text" id="f-title" placeholder="e.g. Town hall moved to Thursday 14:00" />
+              </label>
+              <label class="field">
+                <span>Summary <span class="muted">(shown on the Board)</span></span>
+                <textarea id="f-summary" style="min-height:70px" placeholder="One or two lines that appear in the Notice Board list."></textarea>
+              </label>
+
+              <span class="field" style="display:block">
+                <span style="display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:6px;">Body</span>
+                <div class="editor-toolbar" id="toolbar">
+                  <button type="button" data-cmd="bold" title="Bold"><b>B</b></button>
+                  <button type="button" data-cmd="italic" title="Italic"><i>I</i></button>
+                  <button type="button" data-cmd="formatBlock" data-val="h2" title="Heading">H2</button>
+                  <button type="button" data-cmd="formatBlock" data-val="h3" title="Subheading">H3</button>
+                  <button type="button" data-cmd="insertUnorderedList" title="Bullet list">•</button>
+                  <button type="button" data-cmd="insertOrderedList" title="Numbered list">1.</button>
+                  <button type="button" data-cmd="createLink" title="Link">🔗</button>
+                  <button type="button" data-cmd="removeFormat" title="Clear">⌫</button>
+                </div>
+                <div class="rte" id="f-body" contenteditable="true" data-placeholder="Write the announcement…"></div>
+              </span>
+
+              <div class="form-row" style="margin-top:8px">
+                <label class="field">
+                  <span>External link <span class="muted">(optional)</span></span>
+                  <input type="url" id="f-exturl" placeholder="https://…" />
+                </label>
+                <label class="field">
+                  <span>Link label</span>
+                  <input type="text" id="f-extlabel" placeholder="e.g. Release notes on Confluence" />
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" id="photos-card">
+            <div class="card-head"><h2>Photos</h2></div>
+            <div class="card-body">
+              <div id="photos-disabled" class="hint" hidden>Save the post first, then add photos.</div>
+              <div id="photos-area">
+                <div class="dropzone" id="dropzone">Drop images here or click to upload (JPG, PNG, GIF, WebP · up to 8&nbsp;MB)</div>
+                <input type="file" id="file-input" accept="image/*" multiple hidden />
+                <div class="thumbs" id="thumbs"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Side panel -->
+        <aside class="form-side">
+          <div class="card">
+            <div class="card-head"><h2>Publishing</h2></div>
+            <div class="card-body">
+              <label class="field">
+                <span>Category</span>
+                <select id="f-category"></select>
+              </label>
+              <label class="field">
+                <span>Owner <span class="muted">(named owner)</span></span>
+                <select id="f-owner"></select>
+                <div class="hint">Every page has an owner, per the spec.</div>
+              </label>
+              <label class="field">
+                <span>Review date</span>
+                <input type="date" id="f-review" />
+                <div class="hint">Flagged on the dashboard once it passes.</div>
+              </label>
+              <label style="display:flex;align-items:center;gap:9px;font-size:14px;cursor:pointer;margin-top:4px;">
+                <input type="checkbox" id="f-pinned" style="width:auto" /> Pin to top of the Board
+              </label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body" style="padding:16px 20px;">
+              <div class="row-sub" id="status-line">Status: <span class="chip chip-muted">Draft</span></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast"></div>
+  <script src="/admin/admin.js"></script>
+  <script>
+    (async function () {
+      const user = await Admin.init('posts');
+      if (!user) return;
+      const esc = Admin.esc;
+      const $ = (id) => document.getElementById(id);
+
+      const params = new URLSearchParams(location.search);
+      let postId = params.get('id');
+
+      // Populate category + owner selects.
+      const [{ categories }, { users }] = await Promise.all([
+        Admin.api('/api/categories'), Admin.api('/api/users?basic=1')
+      ]);
+      $('f-category').innerHTML = categories.map((c) => `<option value="${esc(c.slug)}">${esc(c.name)}</option>`).join('');
+      $('f-owner').innerHTML = '<option value="">— none —</option>' +
+        users.map((u) => `<option value="${u.id}">${esc(u.name)} (${esc(u.role)})</option>`).join('');
+
+      // Rich-text toolbar.
+      $('toolbar').addEventListener('click', (e) => {
+        const btn = e.target.closest('button'); if (!btn) return;
+        e.preventDefault();
+        const cmd = btn.dataset.cmd;
+        $('f-body').focus();
+        if (cmd === 'createLink') {
+          const url = prompt('Link URL (https://…)'); if (url) document.execCommand(cmd, false, url);
+        } else if (cmd === 'formatBlock') {
+          document.execCommand(cmd, false, btn.dataset.val);
+        } else {
+          document.execCommand(cmd, false, null);
+        }
+      });
+
+      // Edit mode: load existing post.
+      if (postId) {
+        try {
+          const { post } = await Admin.api('/api/posts/id/' + postId);
+          $('page-title').textContent = 'Edit post';
+          $('f-title').value = post.title || '';
+          $('f-summary').value = post.summary || '';
+          $('f-body').innerHTML = post.body || '';
+          $('f-exturl').value = post.external_url || '';
+          $('f-extlabel').value = post.external_label || '';
+          $('f-category').value = post.category_slug;
+          if (post.owner_id) $('f-owner').value = post.owner_id;
+          $('f-review').value = post.review_date || '';
+          $('f-pinned').checked = !!post.pinned;
+          setStatus(post.status);
+          renderThumbs(post.images || []);
+        } catch (e) { Admin.toast(e.message, true); }
+      } else {
+        // New post: photos need an id first.
+        $('photos-disabled').hidden = false;
+        $('photos-area').hidden = true;
+      }
+
+      function setStatus(s) {
+        $('status-line').innerHTML = 'Status: ' + (s === 'published'
+          ? '<span class="chip">Published</span>' : '<span class="chip chip-muted">Draft</span>');
+      }
+
+      function collect(status) {
+        return {
+          title: $('f-title').value.trim(),
+          summary: $('f-summary').value.trim(),
+          body: $('f-body').innerHTML,
+          external_url: $('f-exturl').value.trim(),
+          external_label: $('f-extlabel').value.trim(),
+          category_slug: $('f-category').value,
+          owner_id: $('f-owner').value || null,
+          review_date: $('f-review').value || null,
+          pinned: $('f-pinned').checked,
+          status: status
+        };
+      }
+
+      async function save(status) {
+        const data = collect(status);
+        if (!data.title) { Admin.toast('A title is required', true); return; }
+        try {
+          if (postId) {
+            await Admin.send('PUT', '/api/posts/' + postId, data);
+            setStatus(status);
+            Admin.toast(status === 'published' ? 'Published' : 'Draft saved');
+          } else {
+            const r = await Admin.send('POST', '/api/posts', data);
+            Admin.toast(status === 'published' ? 'Published' : 'Draft saved');
+            // Reload in edit mode so photos can be attached.
+            location.href = '/admin/posts?id=' + r.id;
+          }
+        } catch (e) { Admin.toast(e.message, true); }
+      }
+
+      $('save-draft').addEventListener('click', () => save('draft'));
+      $('save-publish').addEventListener('click', () => save('published'));
+
+      // ----- Photos -----
+      function renderThumbs(images) {
+        $('thumbs').innerHTML = images.map((im) => `
+          <div class="thumb">
+            <img src="${esc(im.file_path)}" alt="">
+            <button type="button" data-img="${im.id}" title="Remove">&times;</button>
+          </div>`).join('');
+        $('thumbs').querySelectorAll('[data-img]').forEach((b) => {
+          b.addEventListener('click', async () => {
+            try { await Admin.send('DELETE', `/api/posts/${postId}/images/${b.dataset.img}`); reloadImages(); }
+            catch (e) { Admin.toast(e.message, true); }
+          });
+        });
+      }
+      async function reloadImages() {
+        const { post } = await Admin.api('/api/posts/id/' + postId);
+        renderThumbs(post.images || []);
+      }
+      async function uploadFiles(files) {
+        if (!postId || !files.length) return;
+        const fd = new FormData();
+        [...files].forEach((f) => fd.append('photos', f));
+        try { await Admin.send('POST', `/api/posts/${postId}/images`, fd); Admin.toast('Photos added'); reloadImages(); }
+        catch (e) { Admin.toast(e.message, true); }
+      }
+      const dz = $('dropzone');
+      if (dz) {
+        dz.addEventListener('click', () => $('file-input').click());
+        $('file-input').addEventListener('change', (e) => uploadFiles(e.target.files));
+        ['dragover', 'dragenter'].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add('drag'); }));
+        ['dragleave', 'drop'].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove('drag'); }));
+        dz.addEventListener('drop', (e) => uploadFiles(e.dataTransfer.files));
+      }
+    })();
+  </script>
+</body>
+</html>
