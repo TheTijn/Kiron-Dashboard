@@ -82,8 +82,37 @@
       const btn = e.target.closest('.tab'); if (!btn) return;
       state.activeCat = btn.dataset.cat;
       tabs.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t === btn));
+      btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
       loadPosts();
     });
+    wireTabsNav();
+  }
+
+  // Horizontal scroller for the category tabs so they never wrap to a new line.
+  function wireTabsNav() {
+    const tabs = $('tabs');
+    const nav = tabs.closest('.tabs-nav');
+    const prev = $('tabs-prev');
+    const next = $('tabs-next');
+    if (!nav || !prev || !next) return;
+
+    const update = () => {
+      const max = tabs.scrollWidth - tabs.clientWidth;
+      const scrollable = max > 1;
+      nav.classList.toggle('is-scrollable', scrollable);
+      prev.disabled = tabs.scrollLeft <= 1;
+      next.disabled = tabs.scrollLeft >= max - 1;
+    };
+    const step = () => Math.max(tabs.clientWidth * 0.7, 160);
+    prev.addEventListener('click', () => tabs.scrollBy({ left: -step(), behavior: 'smooth' }));
+    next.addEventListener('click', () => tabs.scrollBy({ left: step(), behavior: 'smooth' }));
+    tabs.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    // Wheel over the tabs scrolls horizontally instead of the page.
+    tabs.addEventListener('wheel', (e) => {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { tabs.scrollLeft += e.deltaY; e.preventDefault(); }
+    }, { passive: false });
+    update();
   }
 
   // ---------- posts ----------

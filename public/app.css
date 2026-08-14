@@ -86,8 +86,26 @@
 .board-grid { display: grid; grid-template-columns: 1fr 340px; gap: 26px; align-items: start; }
 
 /* ===== Notice Board ===== */
-.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.tabs-nav { position: relative; display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
+.tabs {
+  display: flex; flex-wrap: nowrap; gap: 8px;
+  overflow-x: auto; scroll-behavior: smooth;
+  padding: 5px 4px;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tabs-arrow {
+  flex: 0 0 auto; display: none; align-items: center; justify-content: center;
+  width: 30px; height: 30px; padding: 0; cursor: pointer;
+  background: var(--panel); border: 1.5px solid var(--line); border-radius: 999px;
+  color: var(--ink-2); transition: border-color .15s ease, color .15s ease, background .15s ease;
+}
+.tabs-arrow svg { width: 16px; height: 16px; }
+.tabs-arrow:hover { border-color: var(--green-border); color: var(--green-bright); }
+.tabs-nav.is-scrollable .tabs-arrow { display: flex; }
+.tabs-arrow:disabled { opacity: .35; cursor: default; border-color: var(--line); color: var(--ink-3); }
 .tab {
+  flex: 0 0 auto; white-space: nowrap;
   font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600;
   color: var(--ink-2); background: var(--panel); border: 1.5px solid var(--line);
   padding: 8px 20px; border-radius: 0;

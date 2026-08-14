@@ -54,7 +54,15 @@
           <h2 class="section-title">Notice Board</h2>
           <span class="eyebrow" id="post-count"></span>
         </div>
-        <div class="tabs" id="tabs"></div>
+        <div class="tabs-nav">
+          <button class="tabs-arrow tabs-arrow-prev" id="tabs-prev" type="button" aria-label="Scroll categories left">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="tabs" id="tabs"></div>
+          <button class="tabs-arrow tabs-arrow-next" id="tabs-next" type="button" aria-label="Scroll categories right">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
         <div class="post-list" id="post-list">
           <div class="empty"><span class="spinner"></span></div>
         </div>
