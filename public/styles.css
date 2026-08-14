@@ -3,9 +3,26 @@
   Clean, minimalist light theme with green accents.
   Shared by the public Board, the login page, and the CMS.
 */
+/* Self-hosted Barlow Condensed (no runtime dependency on Google Fonts). */
+@font-face {
+  font-family: 'Barlow Condensed'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('/Assets/fonts/barlow-condensed-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Barlow Condensed'; font-style: normal; font-weight: 500; font-display: swap;
+  src: url('/Assets/fonts/barlow-condensed-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Barlow Condensed'; font-style: normal; font-weight: 600; font-display: swap;
+  src: url('/Assets/fonts/barlow-condensed-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Barlow Condensed'; font-style: normal; font-weight: 700; font-display: swap;
+  src: url('/Assets/fonts/barlow-condensed-700.woff2') format('woff2');
+}
 
 :root {
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, monospace;
 
   /* Surfaces */
