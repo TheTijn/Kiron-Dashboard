@@ -76,7 +76,7 @@
     state.categories = categories;
     const tabs = $('tabs');
     const mk = (slug, name, active) =>
-      `<button class="tab${active ? ' active' : ''}" data-cat="${esc(slug)}">${esc(name)}</button>`;
+      `<button class="tab${active ? ' active' : ''}" data-cat="${esc(slug)}"><span>${esc(name)}</span></button>`;
     tabs.innerHTML = mk('all', 'All', true) + categories.map((c) => mk(c.slug, c.name, false)).join('');
     tabs.addEventListener('click', (e) => {
       const btn = e.target.closest('.tab'); if (!btn) return;

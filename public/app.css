@@ -101,14 +101,19 @@
 .board-grid { display: grid; grid-template-columns: 1fr 340px; gap: 26px; align-items: start; }
 
 /* ===== Notice Board ===== */
-.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .tab {
-  font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--ink-2); background: var(--panel); border: 1px solid var(--line);
-  padding: 6px 12px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600;
+  color: var(--ink-2); background: var(--panel); border: 1.5px solid var(--line);
+  padding: 8px 20px; border-radius: 0;
+  transform: skewX(-18deg);
+  transition: border-color .15s ease, background .15s ease, color .15s ease;
 }
-.tab:hover { border-color: var(--green-border); }
-.tab.active { background: var(--green); border-color: var(--green); color: #fff; }
+.tab > span { display: inline-block; transform: skewX(18deg); }
+.tab:hover { border-color: var(--green-border); color: var(--ink); }
+.tab.active {
+  background: var(--green-bright); border-color: var(--green-bright); color: #fff;
+}
 
 .post-list { display: flex; flex-direction: column; }
 .post {
