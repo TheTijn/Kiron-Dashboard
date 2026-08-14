@@ -11,7 +11,8 @@
   max-width: var(--maxw); margin: 0 auto; padding: 0 24px;
   height: 64px; display: flex; align-items: center; gap: 20px;
 }
-.brand { display: flex; align-items: baseline; gap: 10px; flex-shrink: 0; }
+.brand { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.brand-logo { height: 26px; width: auto; display: block; }
 .brand-word { font-size: 19px; font-weight: 800; letter-spacing: -.02em; }
 .brand-dot { color: var(--green-bright); }
 .brand-sub {
