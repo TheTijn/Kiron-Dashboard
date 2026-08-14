@@ -80,22 +80,6 @@
 .section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
 .section-title { font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
 
-/* ===== Next Off ===== */
-.next-off { margin-bottom: 26px; }
-.live-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--green-lime); margin-right: 4px; box-shadow: 0 0 0 3px rgba(132,204,22,.2); }
-.next-off-track { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.next-card {
-  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 14px 16px; box-shadow: var(--shadow-sm);
-}
-.next-card .label { margin-bottom: 10px; }
-.next-card .cd {
-  font-family: var(--font-mono); font-size: 21px; font-weight: 700; color: var(--green);
-  font-variant-numeric: tabular-nums; letter-spacing: .01em; margin-bottom: 8px;
-}
-.next-card .cd.soon { color: var(--green-lime); }
-.next-card .nt { font-size: 13.5px; font-weight: 600; }
-.next-card .nl { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
 
 /* ===== Board grid ===== */
 .board-grid { display: grid; grid-template-columns: 1fr 340px; gap: 26px; align-items: start; }
@@ -106,10 +90,10 @@
   font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600;
   color: var(--ink-2); background: var(--panel); border: 1.5px solid var(--line);
   padding: 8px 20px; border-radius: 0;
-  transform: skewX(-18deg);
+  transform: skewX(-27deg);
   transition: border-color .15s ease, background .15s ease, color .15s ease;
 }
-.tab > span { display: inline-block; transform: skewX(18deg); }
+.tab > span { display: inline-block; transform: skewX(27deg); }
 .tab:hover { border-color: var(--green-border); color: var(--ink); }
 .tab.active {
   background: var(--green-bright); border-color: var(--green-bright); color: #fff;
@@ -186,7 +170,6 @@
 @media (max-width: 900px) {
   .board-grid { grid-template-columns: 1fr; }
   .links { position: static; }
-  .next-off-track { grid-template-columns: 1fr 1fr; }
   .link-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 640px) {
@@ -194,7 +177,6 @@
   .brand-sub, .clock { display: none; }
   .search { max-width: none; }
   .wrap { padding: 18px 14px 48px; }
-  .next-off-track { grid-template-columns: 1fr; }
   .post { grid-template-columns: 1fr; gap: 6px; }
   .post-aside { display: flex; gap: 8px; }
   .user-meta { display: none; }

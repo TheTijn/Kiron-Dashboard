@@ -46,7 +46,7 @@
     csrfToken = me.csrfToken;
     renderUser();
     startClock();
-    await Promise.all([loadCategories(), loadEvents(), loadLinks()]);
+    await Promise.all([loadCategories(), loadLinks()]);
     await loadPosts();
     wireSearch();
   }
@@ -152,39 +152,6 @@
     } catch (e) { toast(e.message || 'Could not open post', true); }
   }
   function closeModal() { $('post-modal').hidden = true; }
-
-  // ---------- events / countdown ----------
-  async function loadEvents() {
-    const { events } = await api('/api/events');
-    state.events = events;
-    const section = $('next-off');
-    if (!events.length) { section.style.display = 'none'; return; }
-    renderEvents();
-    setInterval(renderEvents, 1000);
-  }
-  function countdown(iso) {
-    let ms = new Date(iso).getTime() - Date.now();
-    if (ms < 0) ms = 0;
-    const s = Math.floor(ms / 1000);
-    const d = Math.floor(s / 86400);
-    const h = String(Math.floor((s % 86400) / 3600)).padStart(2, '0');
-    const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
-    const sec = String(s % 60).padStart(2, '0');
-    const text = d > 0 ? `${d}d ${h}:${m}:${sec}` : `${h}:${m}:${sec}`;
-    return { text, soon: s < 3600 };
-  }
-  function renderEvents() {
-    $('next-off-track').innerHTML = state.events.map((e) => {
-      const c = countdown(e.starts_at);
-      return `
-        <div class="next-card">
-          <div class="label chip chip-muted">${esc(e.label)}</div>
-          <div class="cd${c.soon ? ' soon' : ''}">${esc(c.text)}</div>
-          <div class="nt">${esc(e.title)}</div>
-          <div class="nl">${esc(e.location || '')}</div>
-        </div>`;
-    }).join('');
-  }
 
   // ---------- quick links ----------
   async function loadLinks() {
