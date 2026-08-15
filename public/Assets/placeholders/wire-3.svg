@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Chart placeholder">
+  <rect width="400" height="300" fill="#f2f4ef"/>
+  <rect x="1" y="1" width="398" height="298" fill="none" stroke="#d4d8d0" stroke-width="2" stroke-dasharray="8 7"/>
+  <line x1="64" y1="60" x2="64" y2="240" stroke="#d4d8d0" stroke-width="3"/>
+  <line x1="64" y1="240" x2="344" y2="240" stroke="#d4d8d0" stroke-width="3"/>
+  <rect x="96" y="176" width="40" height="64" fill="#dfe4da"/>
+  <rect x="156" y="140" width="40" height="100" fill="#cdd3c8"/>
+  <rect x="216" y="104" width="40" height="136" fill="#bcd79a"/>
+  <rect x="276" y="152" width="40" height="88" fill="#dfe4da"/>
+</svg>

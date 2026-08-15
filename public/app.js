@@ -130,18 +130,22 @@
     });
   }
 
+  // Wireframe placeholders shown until a post has a real image attached.
+  const PLACEHOLDERS = ['/Assets/placeholders/wire-1.svg', '/Assets/placeholders/wire-2.svg', '/Assets/placeholders/wire-3.svg'];
+
   function renderPostRow(p) {
     const pid = (p.category_slug || 'post').slice(0, 3).toUpperCase() + '-' + String(p.id).padStart(3, '0');
-    const thumb = p.images && p.images[0]
-      ? `<img class="post-thumb" src="${esc(p.images[0].file_path)}" alt="" loading="lazy">` : '';
+    const hasImg = p.images && p.images[0];
+    const src = hasImg ? p.images[0].file_path : PLACEHOLDERS[(p.id || 0) % PLACEHOLDERS.length];
+    const thumb = `<img class="post-thumb${hasImg ? '' : ' is-placeholder'}" src="${esc(src)}" alt="" loading="lazy">`;
     const pin = p.pinned ? '<span class="chip">Pinned</span>' : '';
     return `
       <article class="post" data-slug="${esc(p.slug)}">
         <div class="post-aside">
           <span class="pid">${esc(pid)}</span><br>${esc(fmtDate(p.published_at || p.created_at))}
         </div>
-        <div>
-          ${thumb}
+        ${thumb}
+        <div class="post-main">
           <h3 class="post-title">${esc(p.title)}</h3>
           <p class="post-summary">${esc(p.summary || '')}</p>
           <div class="post-meta">

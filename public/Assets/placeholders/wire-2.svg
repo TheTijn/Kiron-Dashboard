@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Article placeholder">
+  <rect width="400" height="300" fill="#f2f4ef"/>
+  <rect x="1" y="1" width="398" height="298" fill="none" stroke="#d4d8d0" stroke-width="2" stroke-dasharray="8 7"/>
+  <rect x="56" y="70" width="220" height="16" rx="8" fill="#cdd3c8"/>
+  <rect x="56" y="104" width="288" height="10" rx="5" fill="#dfe4da"/>
+  <rect x="56" y="126" width="288" height="10" rx="5" fill="#dfe4da"/>
+  <rect x="56" y="148" width="200" height="10" rx="5" fill="#dfe4da"/>
+  <rect x="56" y="196" width="96" height="26" rx="13" fill="#bcd79a"/>
+</svg>
