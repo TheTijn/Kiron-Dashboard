@@ -84,11 +84,15 @@
 
 /* ===== Board grid ===== */
 .board-grid { display: grid; grid-template-columns: 1fr 340px; gap: 26px; align-items: start; }
+/* Grid/flex items default to min-width:auto, which would let the non-wrapping
+   tab row stretch the whole page. Allow these columns to shrink so the tabs
+   scroll and the layout stays within the viewport on narrow screens. */
+.notice, .links { min-width: 0; }
 
 /* ===== Notice Board ===== */
 .tabs-nav { position: relative; display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
 .tabs {
-  display: flex; flex-wrap: nowrap; gap: 8px;
+  display: flex; flex-wrap: nowrap; gap: 8px; min-width: 0;
   overflow-x: auto; scroll-behavior: smooth;
   padding: 5px 4px;
   scrollbar-width: none; -ms-overflow-style: none;
@@ -204,6 +208,8 @@
   .topbar-inner { gap: 12px; padding: 0 14px; }
   .brand-sub, .clock { display: none; }
   .search { max-width: none; }
+  .search kbd { display: none; }
+  .brand-logo { height: 22px; }
   .wrap { padding: 18px 14px 48px; }
   .post { grid-template-columns: 132px 1fr; grid-template-areas: "aside aside" "thumb main"; gap: 6px 14px; }
   .post-aside { grid-area: aside; display: flex; gap: 8px; margin-bottom: 4px; }
